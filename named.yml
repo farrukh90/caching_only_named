@@ -1,0 +1,36 @@
+---  # This playbook installs webserver
+- hosts: all
+  connection: ssh
+  become: yes
+  become_method: sudo 
+  gather_facts: no 
+  tasks:
+    - name: install caching-only name server
+      yum: 
+        name: "{{ item }}" 
+        state: present
+      with_items:
+        - bind
+        - bind-utils
+        - telnet
+      notify:
+        - BIND
+
+    -  name: Copy files to remote system
+       copy:
+        src: /etc/ansible/template/named.conf
+        dest: /etc/named.conf
+        owner: root
+        group: root
+        mode: 0640
+
+    - name: BIND
+      systemd: name=named state=started enabled=yes
+
+
+
+
+
+
+
+
